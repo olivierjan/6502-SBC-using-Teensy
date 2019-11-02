@@ -5,10 +5,10 @@ Start simulate some memory for 65c02 to Read/Write.
 */
 
 
-#define ACIA6551            // Model of ACIA to emulate
-//#define ACIA6850          // 6850 or 6551
-#define ROMEMU              // Do we emulate RAM or is it a real chip ? 
-#define RAMEMU              // Do we emulate ROM or is it a real chip ?
+//#define ACIA6551            // Model of ACIA to emulate
+#define ACIA6850          // 6850 or 6551
+//#define ROMEMU              // Do we emulate RAM or is it a real chip ? 
+//#define RAMEMU              // Do we emulate ROM or is it a real chip ?
 
 // For the time being, memory map is :
 // 0x0000 - (RAMSIZE-1):                RAM

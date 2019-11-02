@@ -102,7 +102,7 @@ void loop(){
   switch (chipEnable) {
 
 
-#ifdef ACIA6551 | ACIA6850
+#if defined ACIA6551 || defined ACIA6850
     case ACIAENABLE:
       if (rw) {
         if (address == ACIADATA){           // CPU wants to get data
