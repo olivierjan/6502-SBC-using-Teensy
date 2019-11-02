@@ -18,11 +18,14 @@ byte dataPins[] = {2,14,7,8,6,20,21,5};         // Data Bus
 byte addressHPins [] = {16,17,19,18,0,1,29,30}; // Address Bus High byte
 byte addressLPins[]={15,22,23,9,10,13,11,12};   // Address Bus Low byte
 uint8_t chipEnable;                             // RAM, ROM or Serial to access
-
+#ifdef DEBUG
+byte databyte=0;
+uint16_t savedaddress=0;
+#endif
 // Declare global variables
 // Must be volatile to avoid any compiler optimization
 
-volatile byte addressL,addressH,data;
+volatile byte addressL,addressH;
 volatile uint16_t i;
 volatile boolean rw;
 volatile byte ACIAStatus;
@@ -40,6 +43,26 @@ void setup() {
   Serial.begin(0);                // Start the serial port
 
   // Set all pins to their initial state.
+  #ifdef DEBUG
+    delay(2000);
+    #ifdef RAMEMU
+    Serial.print("RAM Emulation\n");
+    #endif
+
+    #ifdef ROMEMU
+    Serial.print("ROM Emulation\n");
+    #endif
+
+    #ifdef ACIA6551
+    Serial.print("6551 ACIA Emulation\n");
+    #endif
+
+    #ifdef ACIA6850
+    Serial.print("6850 ACIA Emulation\n");
+    #endif
+
+    Serial.print("Initializing PINs\n");
+  #endif 
   for (int i=0;i<8;i++) {
     pinMode(dataPins[i],INPUT);               //Ensure we're not writing to the Bus
     pinMode(addressLPins[i],INPUT_PULLDOWN);
@@ -50,6 +73,9 @@ void setup() {
   pinMode(CLOCKPIN, OUTPUT);
   pinMode(RESETPIN, OUTPUT);
 
+  #ifdef DEBUG
+  Serial.print("Initializing varialbles\n");
+  #endif
 
   // Initialize some variables
   addressL=0x0;
@@ -57,15 +83,28 @@ void setup() {
   chipEnable=0x0;
   rw=true;
 
+  #ifdef DEBUG
+  Serial.print("Bringing RESET LOW\n");
+  #endif
+  
   digitalWrite(RESETPIN,LOW);     // Bring the RESET LOW to get the 6502
                                   // in a reset state
 
 #ifdef RAMEMU
+  #ifdef DEBUG
+  Serial.print("Initializing RAM\n");
+  #endif
+  
   memset(mem,0x00,sizeof(mem));   // Initialize memory to 0x00
 #endif                                  
   delay(2000);                    // Keep RESET for 2 second
                                   // in order for Serial to be ready
+  #ifdef DEBUG
+  Serial.print("Releasing RESET\n");
+  #endif
+  
   digitalWrite(RESETPIN,HIGH);    // Release RESET and start working
+  
   Serial.print("Starting SBC....\n");
 }
 
@@ -86,7 +125,9 @@ void loop(){
                                           // add to addressH.
 
   address = ((uint16_t)addressH << 8)| addressL; // Build the complete address
-  // chipEnable = addressH >> 5;               // Detect which chip should be selected by keeping 3 MSB from address
+  #ifdef DEBUG
+  savedaddress=address;                           // Saving original address for DEBUG as it's modified for ROM access. 
+  #endif
   
   if (address < RAMSIZE) { 
         chipEnable=RAMENABLE;
@@ -98,6 +139,8 @@ void loop(){
   rw=(GPIOA_PDIR>>12)&0x1;                  // Check if it's a Write Cycle
                                             // or Read Cycle
   GPIOD_PDDR=(rw) ? GPIOOUTPUT : GPIOINPUT; // Configure PIN direction.
+
+
 
   switch (chipEnable) {
 
@@ -139,5 +182,15 @@ void loop(){
     default:
       break;
   }
+  #ifdef DEBUG
+  databyte=(rw) ? GPIOD_PDOR : GPIOD_PDIR;
+  Serial.print(savedaddress,HEX);
+  Serial.print("\t");
+  Serial.print(rw);
+  Serial.print("\t");
+  Serial.print(databyte,HEX);
+  Serial.print("\n");
+  delay(50);
+  #endif
   GPIOD_PDDR=GPIOINPUT;           // Switch back GPIO to Input
 }

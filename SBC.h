@@ -5,6 +5,7 @@ Start simulate some memory for 65c02 to Read/Write.
 */
 
 
+//#define DEBUG
 #define ACIA6551            // Model of ACIA to emulate
 //#define ACIA6850          // 6850 or 6551
 #define ROMEMU              // Do we emulate RAM or is it a real chip ? 
