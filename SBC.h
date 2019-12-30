@@ -8,7 +8,7 @@ Start simulate some memory for 65c02 to Read/Write.
 //#define DEBUG
 #define ACIA6551            // Model of ACIA to emulate
 //#define ACIA6850          // 6850 or 6551
-#define ROMEMU              // Do we emulate RAM or is it a real chip ? 
+//#define ROMEMU              // Do we emulate RAM or is it a real chip ? 
 //#define RAMEMU              // Do we emulate ROM or is it a real chip ?
 
 // For the time being, memory map is :
@@ -20,7 +20,7 @@ Start simulate some memory for 65c02 to Read/Write.
 
 #define RAMSIZE     0xA000  // Size of RAM to emulate
 #define ACIADDRESS  0xA000  // Base address of Serial Device
-#define ROMADDRESS  0xB000  // Base address of ROM Data 
+#define ROMADDRESS  0xC000  // Base address of ROM Data 
                             // make sure your ROM fit as there is nocheck.
                             // if the ROM is too big some of it won't be reachable with 16bits addresses
 
